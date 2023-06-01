@@ -1,9 +1,12 @@
 package com.example.myapplication
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
@@ -21,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Type
 
 
-class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
+class MainActivity : AppCompatActivity() {
     lateinit  var repoList:ArrayList<RepoModel>
     lateinit  var api:String
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +39,7 @@ class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
         setContentView(R.layout.activity_main)
 
         loadData()
-//        if(repoList.isEmpty())
-//            repoList = arrayListOf()
+
         val materialToolbar: MaterialToolbar = findViewById(R.id.material_toolbar)
         materialToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
 
     }
 
+    //Save existing repos
     override fun onPause() {
         Log.i("pref","saving data")
         if(repoList.isNotEmpty()){
@@ -72,6 +75,7 @@ class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
     }
 
 
+    //will check is any previous data is available
      fun loadData() {
          Log.i("pref","getting data")
         val sharedPreferences = getSharedPreferences("RepoList", MODE_PRIVATE)
@@ -87,6 +91,8 @@ class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
 
 
     }
+
+    // Called when new repo needs to be added
 
     private fun getRepoAlertBox() {
         val  builder = AlertDialog.Builder(this)
@@ -105,8 +111,15 @@ class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
         }
     }
 
-
+//Build the recycler view with repo content
     fun buildRV(repoList:List<RepoModel>){
+
+
+        if(repoList.isEmpty())
+            findViewById<TextView>(R.id.addMessage).visibility = View.VISIBLE
+        else
+            findViewById<TextView>(R.id.addMessage).visibility = View.GONE
+
         val rvList: RecyclerView= findViewById(R.id.rvList)
         rvList.layoutManager = LinearLayoutManager(this)
         val adapter = CustomAdapter(this,repoList)
@@ -141,34 +154,7 @@ class MainActivity : AppCompatActivity() , Toolbar.OnMenuItemClickListener {
 
 
 
-//        retrofitData.enqueue(object :Callback<repoModel?> {
-//            //Callback<List<repoModel>?> {
-//            override fun onResponse(
-//                call: Call<repoModel?>,
-//                response: Response<repoModel?>
-//            ) {
-//                Toast.makeText(this@MainActivity,"YOKLO",Toast.LENGTH_SHORT).show()
-//
-//                val resBody = response.body()!!
-//                Toast.makeText(this@MainActivity,resBody.toString(),Toast.LENGTH_SHORT).show()
-//                val mystringBuilder = StringBuilder()
-//                for(myData in resBody){
-//                    mystringBuilder.append(myData.name)
-//                }
-////                Toast.makeText(this@MainActivity,resBody.toString(),Toast.LENGTH_SHORT).show()
-//                Log.i("Res",mystringBuilder.toString())
-//            }
-//
-//            override fun onFailure(call: Call<repoModel?>, t: Throwable) {
-//               Log.e("Res","Error")
-//            }
-//        })
-
-
     }
 
-    override fun onMenuItemClick(item: MenuItem?): Boolean {
-        Toast.makeText(this, "Menu Item issdcs Pressed", Toast.LENGTH_SHORT).show()
-        return true
-    }
+
 }
